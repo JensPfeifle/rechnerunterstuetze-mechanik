@@ -1,0 +1,67 @@
+%% Aufgabe 1
+
+x = [1;0;3]
+y = [-1;6;0.5]
+
+b1 = x'*y
+b2a = x*y'
+b2b = y*x'
+
+b3a = x.*y
+b3b = x./y
+
+b4a = x + y
+b4b = x - y
+
+nullmatrix = zeros(3,4)
+nullzeilen= [0;0;0;0;0]
+nullspalten = [0,0,0,0,0]
+
+n = 2;
+ehm = eye(n,n)
+
+m = 3;
+matr = zeros(m,m);
+for i=1:m
+    matr(:,i) = rand(1,m)
+end
+
+% e)
+A = [1,2,3;4,5,6]
+B = [-1,0.5,1.5;-7,2,1;1,0.4,12]
+C = [0.1,2.4,sqrt(2);123,-8,(2/7);0.25,1,2]
+
+% f)
+A*B
+B*A'
+B - C
+
+%% Aufgabe 2
+% a)
+dim = 8
+x = zeros(dim,0)
+i = 1;
+while (i<dim)
+    x(i) = i
+    i = i + 1;
+end
+
+% b)
+m = 3;
+matr = zeros(m,m);
+for i=1:m
+    for j = 1:m
+        matr(i,j) = rand(1)
+    end
+end
+
+%% Aufgabe 3
+% a)
+a = 3;
+b = 5;
+x = a + (b-a).*rand(20,1);
+x
+alpha = 2;
+y = exp(alpha.*x);
+y
+
