@@ -1,4 +1,5 @@
 from numpy import trace
+import numpy as np
 from numpy.linalg import det, matrix_rank, eig, eigh
 
 
@@ -31,7 +32,7 @@ def vectornorm(v, p):
         return max(v)
 
     elif p == 2:
-        return (sum(x**2))**(1/2)
+        return (sum(v**2))**(1/2)
 
     else:
         n = 0
@@ -54,17 +55,3 @@ def test_spd(A):
         if l <= 0:
             return False
     return True
-
-
-if __name__ == '__main__':
-    import numpy as np
-    from numpy.linalg import norm
-    print("Test vectornorm:")
-    # Zufallsvektor erstellen
-    x = np.random.rand(5)
-    p_values = [1,np.inf,2,3.3,4]
-    print("Zufallsvektor: {}".format(x))
-    for p in p_values:
-        print("p={}".format(p))      
-        print("my norm: {}".format(vectornorm(x,p)))
-        print("la.norm: {}".format(norm(x,p)))

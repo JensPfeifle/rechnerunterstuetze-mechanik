@@ -1,2 +1,2 @@
 from .basics import matprint, matprops, test_spd, vectornorm
-from .solve import thomas
+from .solve import solve_thomas
