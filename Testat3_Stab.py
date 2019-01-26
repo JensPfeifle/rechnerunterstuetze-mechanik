@@ -1,3 +1,4 @@
+
 import numpy as np
 import scipy.sparse
 import scipy.sparse.linalg
@@ -9,7 +10,7 @@ import logging
 a = 4
 b = 12
 c = 5
-E = 21000
+E = 210000
 N = 5
 R = 2.5
 r0 = 1.25
@@ -30,8 +31,6 @@ def radius(x):
     if type(x) == np.ndarray:
         radii = np.zeros(len(x))
         for n, coord in enumerate(x):
-            if coord < 0 or coord > a+b+c:
-                print("Error, radius(coord) out of bounds!")
             if coord <= a:
                 radii[n] = R
             elif coord > a and coord < a+b:
@@ -40,8 +39,6 @@ def radius(x):
                 radii[n] = r0
         return radii
     else:
-        if x < 0 or x > a+b+c:
-            print("Error, radius(x) out of bounds!")
         if x <= a:
             return R
         elif x > a and x < a+b:
@@ -284,15 +281,16 @@ def ReduceSparseMatrix(K, idx):
 
 if __name__ == "__main__":
     # plot setup
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, sharex=True)
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, sharex=False)
 
     # diskretisierung
     n = 0
-    vx = np.zeros(N + 2*N + N)  # vektor der knotenkoordinaten
+    vx = np.zeros(N + 2*N + N+1)  # vektor der knotenkoordinaten
     vx[0: N] = np.arange(0, a, a/N)
     vx[N: N+2*N] = np.arange(a, a+b, b/(2*N))
-    vx[N+2*N:] = np.arange(a+b, a+b+c, c/N)
-    ax1.scatter(vx, [0]*len(vx), c="orange")
+    vx[N+2*N:] = np.arange(a+b, a+b+c+1, c/N)
+    for x in vx:
+        ax1.plot([x, x], [radius(x), -radius(x)], c="blue")
 
     # darstellung geometrie und knoten
     pltx = np.linspace(0, a+b+c, 100)
@@ -339,4 +337,53 @@ if __name__ == "__main__":
     print("Kraefte:")
     print(f)
 
+    u = u.toarray().flatten()
+
+    # weitere plots
+    # verschiebung
+    ax2.plot(vx, u, label="u", color="green")
+
+    # verschiebungsgradient
+    eps = np.zeros(len(u)-1)
+    for j in range(len(u)-1):
+        du = u[j]*dphi(0.5*(vx[j]+vx[j+1]), j, vx) + u[j+1] * \
+            dphi(0.5*(vx[j]+vx[j+1]), j+1, vx)
+        eps[j] = du
+    ax3.step(vx[1:], eps, color="orange")
+
+    # verformte geometrie
+    scalefactor = 1e5
+    vx_def = vx + u*scalefactor
+    ax4.plot(vx_def, radius(vx), color="blue")
+    ax4.plot(vx_def, -1*radius(vx), color="blue")
+    for x in vx_def:
+        ax4.plot([x, x], [radius(x), -radius(x)], c="blue")
+
+    # Kraftpfeile
+    Fext = rbF[0]
+    ar = (vx[-1], 0, Fext, 0)
+    ax1.arrow(*ar, width=0.5)
+    ar = (vx_def[-1], 0, Fext, 0)
+    ax4.arrow(*ar, width=0.5)
+    Freact = f.toarray().flatten()[0]
+    ar = (0, 0, Freact, 0)
+    ax4.arrow(*ar, width=0.5)
+
+    # set limits and titles
+    ax1.set_title("Geoemtrie und Belastung")
+    ax2.set_title("Verschiebung")
+    ax3.set_title("Verschiebungsgradient")
+    ax4.set_title("Verformte Geometrie (Skalierung {})".format(scalefactor))
+
+    ax1.set_ylim([-5, 5])
+    ax2.set_ylim(0, 2e-5)
+    ax3.set_ylim([0, 1e-6])
+    ax4.set_ylim([-5, 5])
+
+    ax1.set_xlim(-4, 25)
+    ax2.set_xlim(-4, 25)
+    ax3.set_xlim(-4, 25)
+    ax4.set_xlim(-4, 25)
+
+    plt.tight_layout()
     plt.show()
